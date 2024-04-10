@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  apigateway:
+    build: ./ApiGateway
+    ports:
+      - "7001:80"
+
+  ordermanagement:
+    build: ./OrderManagement
+    ports:
+      - "7002:80"
+
+  paymentprocessing:
+    build: ./PaymentProcessing
+    ports:
+      - "7003:80"
+
+  productcatalog:
+    build: ./ProductCatalog
+    ports:
+      - "7004:80"
+
+  shoppingcart:
+    build: ./ShoppingCart
+    ports:
+      - "7005:80"
+
+  usermanagement:
+    build: ./UserManagement
+    ports:
+      - "7006:80"
