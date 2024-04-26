@@ -5,6 +5,13 @@ services:
     build: ./ApiGateway
     ports:
       - "7001:80"
+    depends_on:
+      - ordermanagement
+      - paymentprocessing
+      - productcatalog
+      - shoppingcart
+      - usermanagement
+
 
   ordermanagement:
     build: ./OrderManagement

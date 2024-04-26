@@ -1,0 +1,59 @@
+{
+    "SwaggerEndpoints": [
+        {
+            "Key": "OrderManagement",
+            "TransformByOcelotConfig": true,
+            "Config": [
+                {
+                    "Name": "OrderManagement Service",
+                    "Version": "v1",
+                    "Url": "http://ordermanagement:80/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "PaymentProcessing",
+            "TransformByOcelotConfig": true,
+            "Config": [
+                {
+                    "Name": "PaymentProcessing Service",
+                    "Version": "v1",
+                    "Url": "http://paymentprocessing:80/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "ProductCatalog",
+            "TransformByOcelotConfig": true,
+            "Config": [
+                {
+                    "Name": "ProductCatalog Service",
+                    "Version": "v1",
+                    "Url": "http://productcatalog:80/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "ShoppingCart",
+            "TransformByOcelotConfig": true,
+            "Config": [
+                {
+                    "Name": "ShoppingCart Service",
+                    "Version": "v1",
+                    "Url": "http://shoppingcart:80/swagger/v1/swagger.json"
+                }
+            ]
+        },
+        {
+            "Key": "UserManagement",
+            "TransformByOcelotConfig": true,
+            "Config": [
+                {
+                    "Name": "UserManagement Service",
+                    "Version": "v1",
+                    "Url": "http://usermanagement:80/swagger/v1/swagger.json"
+                }
+            ]
+        }
+    ]
+}

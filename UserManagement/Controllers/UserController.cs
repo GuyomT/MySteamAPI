@@ -1,70 +1,73 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using UserManagement.Data;
 using UserManagement.Models;
+using Microsoft.EntityFrameworkCore;
 using UserManagement.Services;
 
 namespace UserManagement.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    [Route("[controller]")]
+    public class UsersController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly UserContext _context;
+        private readonly JwtService _jwtService;
 
-        public UserController(IUserService userService)
+        public UsersController(UserContext context, JwtService jwtService)
         {
-            _userService = userService;
+            _context = context;
+            _jwtService = jwtService;
+
         }
 
-        // GET: api/User
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAll()
+        public async Task<ActionResult<List<User>>> GetAllUsers()
         {
-            var users = await _userService.GetAll();
-            return Ok(users);
+            return await _context.Users.ToListAsync();
         }
 
-        // GET: api/User/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetById(int id)
+        public async Task<ActionResult<User>> GetUser(int id)
         {
-            var user = await _userService.GetById(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound();
+            return Ok(user);
         }
 
-        // POST: api/User
         [HttpPost]
-        public async Task<ActionResult<User>> Create(User user)
+        public async Task<ActionResult<User>> CreateUser(User user)
         {
-            await _userService.Create(user);
-            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+            user.Token = _jwtService.GenerateToken(user.FirstName);
+            Console.WriteLine(user.Token);
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
-        // PUT: api/User/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, User user)
+        public async Task<IActionResult> UpdateUser(int id, User user)
         {
             if (id != user.Id)
             {
                 return BadRequest();
             }
 
-            await _userService.Update(user);
+            _context.Entry(user).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // DELETE: api/User/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            await _userService.Delete(id);
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
             return NoContent();
         }
     }

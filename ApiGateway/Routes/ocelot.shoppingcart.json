@@ -1,0 +1,21 @@
+{
+    "Routes": [
+        {
+            "DownstreamPathTemplate": "/api/cart/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "shoppingcart",
+                    "Port": 80
+                }
+            ],
+            "UpstreamPathTemplate": "/api/cart/{everything}",
+            "UpstreamHttpMethod": [
+                "Get",
+                "Post",
+                "Delete"
+            ],
+            "SwaggerKey": "ShoppingCart"
+        }
+    ]
+}

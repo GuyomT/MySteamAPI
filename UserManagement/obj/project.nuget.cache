@@ -1,13 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "Rj9IAJUe5D/CUxKKIeFi3MAruMOotdWQbuxSnQoHiu8gZV1FeF4t+GJKS4sRetagy+7prguxXvDb2HPnYHC7GA==",
+  "dgSpecHash": "Vf2z5D/Z/uL3j20CmPJx44i1NELlOHiwv5mjgOPfqYgDYycukxN411Q4z6Wz81JuXQBEcULTDslI32XEfC3meg==",
   "success": true,
   "projectFilePath": "/Users/guyomt/UQAR/TechnologieCommerceElectronique/TP2TCE/MySteamAPI/UserManagement/UserManagement.csproj",
   "expectedPackageFiles": [
     "/Users/guyomt/.nuget/packages/azure.core/1.35.0/azure.core.1.35.0.nupkg.sha512",
     "/Users/guyomt/.nuget/packages/azure.identity/1.10.3/azure.identity.1.10.3.nupkg.sha512",
     "/Users/guyomt/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
-    "/Users/guyomt/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.3/microsoft.aspnetcore.authentication.jwtbearer.8.0.3.nupkg.sha512",
+    "/Users/guyomt/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.4/microsoft.aspnetcore.authentication.jwtbearer.8.0.4.nupkg.sha512",
     "/Users/guyomt/.nuget/packages/microsoft.aspnetcore.openapi/8.0.1/microsoft.aspnetcore.openapi.8.0.1.nupkg.sha512",
     "/Users/guyomt/.nuget/packages/microsoft.bcl.asyncinterfaces/6.0.0/microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
     "/Users/guyomt/.nuget/packages/microsoft.codeanalysis.analyzers/3.3.3/microsoft.codeanalysis.analyzers.3.3.3.nupkg.sha512",

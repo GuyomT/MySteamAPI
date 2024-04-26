@@ -1,0 +1,19 @@
+{
+    "Routes": [
+        {
+            "DownstreamPathTemplate": "/api/payments/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "paymentprocessing",
+                    "Port": 80
+                }
+            ],
+            "UpstreamPathTemplate": "/api/payments/{everything}",
+            "UpstreamHttpMethod": [
+                "Post"
+            ],
+            "SwaggerKey": "PaymentProcessing"
+        }
+    ]
+}
