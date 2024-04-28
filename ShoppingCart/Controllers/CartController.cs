@@ -13,25 +13,29 @@ namespace ShoppingCart.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ShoppingCartController : ControllerBase
+    public class CartController : ControllerBase
     {
         private readonly UserContext _context;
         private readonly HttpClient _httpClient;
+        private readonly string _paymentProcessingUrl;
+        private readonly string _userManagementUrl;
 
-        public ShoppingCartController(UserContext context, IHttpClientFactory httpClientFactory)
+        public CartController(UserContext context, IHttpClientFactory httpClientFactory)
         {
             _context = context;
             _httpClient = httpClientFactory.CreateClient();
+            _paymentProcessingUrl = "http://localhost:5249/payment/charge";
+            _userManagementUrl = "http://localhost:5238/api/users";
         }
 
-        // GET: api/ShoppingCart
+        // GET: api/Cart
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetShoppingCartItems()
+        public async Task<ActionResult<IEnumerable<User>>> GetCartItems()
         {
             try
             {
-                // Fetch shopping cart items from the database
-                var items = await _context.ShoppingCartItems.ToListAsync();
+                // Fetch cart items from the database
+                var items = await _context.CartItems.ToListAsync();
                 return Ok(items);
             }
             catch (Exception ex)
@@ -40,13 +44,13 @@ namespace ShoppingCart.Controllers
             }
         }
 
-        // GET: api/ShoppingCart/{id}
+        // GET: api/Cart/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetShoppingCartItem(int id)
+        public async Task<ActionResult<User>> GetCartItem(int id)
         {
             try
             {
-                var item = await _context.ShoppingCartItems.FindAsync(id);
+                var item = await _context.CartItems.FindAsync(id);
                 if (item == null)
                 {
                     return NotFound();
@@ -59,15 +63,33 @@ namespace ShoppingCart.Controllers
             }
         }
 
-        // POST: api/ShoppingCart
+        // POST: api/Cart
         [HttpPost]
-        public async Task<ActionResult<User>> AddToShoppingCart(User user)
+        public async Task<ActionResult<User>> AddToCart(User user)
         {
             try
             {
-                _context.ShoppingCartItems.Add(user);
+                _context.CartItems.Add(user);
                 await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetShoppingCartItem), new { id = user.Id }, user);
+
+                // Call to payment processing service to process payment
+                var paymentRequest = new PaymentRequest { Amount = user.Amount, Token = user.Token };
+                var paymentResponse = await _httpClient.PostAsJsonAsync(_paymentProcessingUrl, paymentRequest);
+                if (!paymentResponse.IsSuccessStatusCode)
+                {
+                    // Handle payment failure
+                    return StatusCode((int)paymentResponse.StatusCode, "Payment processing failed");
+                }
+
+                // Call to user management service to create user
+                var userResponse = await _httpClient.PostAsJsonAsync(_userManagementUrl, user);
+                if (!userResponse.IsSuccessStatusCode)
+                {
+                    // Handle user creation failure
+                    return StatusCode((int)userResponse.StatusCode, "User creation failed");
+                }
+
+                return CreatedAtAction(nameof(GetCartItem), new { id = user.Id }, user);
             }
             catch (Exception ex)
             {
@@ -75,9 +97,9 @@ namespace ShoppingCart.Controllers
             }
         }
 
-        // PUT: api/ShoppingCart/{id}
+        // PUT: api/Cart/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateShoppingCartItem(int id, User user)
+        public async Task<IActionResult> UpdateCartItem(int id, User user)
         {
             if (id != user.Id)
             {
@@ -92,7 +114,7 @@ namespace ShoppingCart.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ShoppingCartItemExists(id))
+                if (!CartItemExists(id))
                 {
                     return NotFound();
                 }
@@ -107,19 +129,19 @@ namespace ShoppingCart.Controllers
             }
         }
 
-        // DELETE: api/ShoppingCart/{id}
+        // DELETE: api/Cart/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> RemoveFromShoppingCart(int id)
+        public async Task<IActionResult> RemoveFromCart(int id)
         {
             try
             {
-                var item = await _context.ShoppingCartItems.FindAsync(id);
+                var item = await _context.CartItems.FindAsync(id);
                 if (item == null)
                 {
                     return NotFound();
                 }
 
-                _context.ShoppingCartItems.Remove(item);
+                _context.CartItems.Remove(item);
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
@@ -129,45 +151,9 @@ namespace ShoppingCart.Controllers
             }
         }
 
-        private bool ShoppingCartItemExists(int id)
+        private bool CartItemExists(int id)
         {
-            return _context.ShoppingCartItems.Any(e => e.Id == id);
-        }
-
-                // POST: api/ShoppingCart
-        [HttpPost]
-        public async Task<ActionResult<User>> AddToShoppingCart(User user)
-        {
-            try
-            {
-                // Ajouter un nouvel élément au panier d'achat
-                _context.ShoppingCartItems.Add(user);
-                await _context.SaveChangesAsync();
-
-                // Appel vers le service de payment processing pour effectuer le paiement
-                var paymentRequest = new PaymentRequest { Amount = user.Amount, Token = user.Token };
-                var paymentResponse = await _httpClient.PostAsJsonAsync(_paymentProcessingUrl, paymentRequest);
-                if (!paymentResponse.IsSuccessStatusCode)
-                {
-                    // Gérer l'échec du paiement
-                    return StatusCode((int)paymentResponse.StatusCode, "Payment processing failed");
-                }
-
-                // Appel vers le service de user management pour créer l'utilisateur
-                var userResponse = await _httpClient.PostAsJsonAsync(_userManagementUrl, user);
-                if (!userResponse.IsSuccessStatusCode)
-                {
-                    // Gérer l'échec de la création de l'utilisateur
-                    return StatusCode((int)userResponse.StatusCode, "User creation failed");
-                }
-
-                return CreatedAtAction(nameof(GetShoppingCartItem), new { id = user.Id }, user);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return _context.CartItems.Any(e => e.Id == id);
         }
     }
 }
-
