@@ -1,6 +1,6 @@
 
 
-namespace UserManagement.Models
+namespace OrderManagement.Models
 {
     public class User
     {

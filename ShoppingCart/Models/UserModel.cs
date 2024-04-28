@@ -1,6 +1,6 @@
 
 
-namespace UserManagement.Models
+namespace ShoppingCart.Models
 {
     public class User
     {

@@ -1,6 +1,6 @@
 
 
-namespace UserManagement.Models
+namespace PaymentProcessing.Models
 {
     public class User
     {

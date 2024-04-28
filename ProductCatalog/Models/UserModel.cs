@@ -1,6 +1,6 @@
 
 
-namespace UserManagement.Models
+namespace ProductCatalog.Models
 {
     public class User
     {
