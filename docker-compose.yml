@@ -12,7 +12,6 @@ services:
       - shoppingcart
       - usermanagement
 
-
   ordermanagement:
     build: ./OrderManagement
     ports:
@@ -37,3 +36,18 @@ services:
     build: ./UserManagement
     ports:
       - "7006:80"
+
+  sqlserver:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server2022
+    restart: always
+    environment:
+      SA_PASSWORD: YourStrong(!)Password
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:

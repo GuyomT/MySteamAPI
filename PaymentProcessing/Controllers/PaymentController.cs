@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Stripe;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/payments")]
 public class PaymentController : ControllerBase
 {
     [HttpPost("charge")]
