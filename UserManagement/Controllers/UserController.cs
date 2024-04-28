@@ -138,5 +138,56 @@ namespace UserManagement.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+       [HttpGet("external")]
+        public async Task<ActionResult<IEnumerable<string>>> GetInfoFromOtherMicroservices()
+        {
+            var orderManagementUrl = _configuration["ServiceUrls:OrderManagement"];
+            var paymentProcessingUrl = _configuration["ServiceUrls:PaymentProcessing"];
+            var productCatalogUrl = _configuration["ServiceUrls:ProductCatalog"];
+            var shoppingCartUrl = _configuration["ServiceUrls:ShoppingCart"];
+
+            var tasks = new List<Task<string>>();
+
+            using (var client = new HttpClient())
+            {
+                tasks.Add(GetContentFromUrl(client, orderManagementUrl));
+                tasks.Add(GetContentFromUrl(client, paymentProcessingUrl));
+                tasks.Add(GetContentFromUrl(client, productCatalogUrl));
+                tasks.Add(GetContentFromUrl(client, shoppingCartUrl));
+
+                await Task.WhenAll(tasks);
+
+                var results = new List<string>();
+                foreach (var task in tasks)
+                {
+                    results.Add(await task);
+                }
+
+                return Ok(results);
+            }
+        }
+
+        private async Task<string> GetContentFromUrl(HttpClient client, string url)
+        {
+            try
+            {
+                var response = await client.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return content;
+                }
+                else
+                {
+                    return $"Error: {response.StatusCode}";
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Internal server error: {ex.Message}";
+            }
+        }
     }
 }
