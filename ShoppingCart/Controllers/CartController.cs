@@ -1,159 +1,100 @@
-// using Microsoft.AspNetCore.Mvc;
-// using System;
-// using System.Collections.Generic;
-// using System.Net.Http;
-// using System.Text;
-// using System.Text.Json;
-// using System.Threading.Tasks;
-// using Microsoft.EntityFrameworkCore;
-// using ShoppingCart.Models;
-// using ShoppingCart.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ShoppingCart.Data;
+using ShoppingCart.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-// namespace ShoppingCart.Controllers
-// {
-//     [ApiController]
-//     [Route("api/[controller]")]
-//     public class CartController : ControllerBase
-//     {
-//         private readonly CartContext _context;
-//         private readonly HttpClient _httpClient;
-//         private readonly string _paymentProcessingUrl;
-//         private readonly string _userManagementUrl;
+namespace ShoppingCart.Controllers
+{
+    [ApiController]
+    [Route("api/cart")]
+    public class ShoppingCartController : ControllerBase
+    {
+        private readonly ShoppingCartContext _context;
 
-//         public CartController(CartContext context, IHttpClientFactory httpClientFactory)
-//         {
-//             _context = context;
-//             _httpClient = httpClientFactory.CreateClient();
-//             _paymentProcessingUrl = "http://localhost:5249/payment/charge";
-//             _userManagementUrl = "http://localhost:5238/api/users";
-//         }
+        public ShoppingCartController(ShoppingCartContext context)
+        {
+            _context = context;
+        }
 
-//         // GET: api/Cart
-//         [HttpGet]
-//         public async Task<ActionResult<IEnumerable<User>>> GetCartItems()
-//         {
-//             try
-//             {
-//                 // Fetch cart items from the database
-//                 var items = await _context.CartItems.ToListAsync();
-//                 return Ok(items);
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, $"Internal server error: {ex.Message}");
-//             }
-//         }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CartItem>>> GetCartItems()
+        {
+            return await _context.CartItems.ToListAsync();
+        }
 
-//         // GET: api/Cart/{id}
-//         [HttpGet("{id}")]
-//         public async Task<ActionResult<User>> GetCartItem(int id)
-//         {
-//             try
-//             {
-//                 var item = await _context.CartItems.FindAsync(id);
-//                 if (item == null)
-//                 {
-//                     return NotFound();
-//                 }
-//                 return Ok(item);
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, $"Internal server error: {ex.Message}");
-//             }
-//         }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CartItem>> GetCartItem(int id)
+        {
+            var cartItem = await _context.CartItems.FindAsync(id);
 
-//         // POST: api/Cart
-//         [HttpPost]
-//         public async Task<ActionResult<User>> AddToCart(User user)
-//         {
-//             try
-//             {
-//                 _context.CartItems.Add(user);
-//                 await _context.SaveChangesAsync();
+            if (cartItem == null)
+            {
+                return NotFound();
+            }
 
-//                 // Call to payment processing service to process payment
-//                 var paymentRequest = new PaymentRequest { Amount = user.Amount, Token = user.Token };
-//                 var paymentResponse = await _httpClient.PostAsJsonAsync(_paymentProcessingUrl, paymentRequest);
-//                 if (!paymentResponse.IsSuccessStatusCode)
-//                 {
-//                     // Handle payment failure
-//                     return StatusCode((int)paymentResponse.StatusCode, "Payment processing failed");
-//                 }
+            return cartItem;
+        }
 
-//                 // Call to user management service to create user
-//                 var userResponse = await _httpClient.PostAsJsonAsync(_userManagementUrl, user);
-//                 if (!userResponse.IsSuccessStatusCode)
-//                 {
-//                     // Handle user creation failure
-//                     return StatusCode((int)userResponse.StatusCode, "User creation failed");
-//                 }
+        [HttpPost]
+        public async Task<ActionResult<CartItem>> CreateCartItem(CartItem cartItem)
+        {
+            _context.CartItems.Add(cartItem);
+            await _context.SaveChangesAsync();
 
-//                 return CreatedAtAction(nameof(GetCartItem), new { id = user.Id }, user);
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, $"Internal server error: {ex.Message}");
-//             }
-//         }
+            return CreatedAtAction(nameof(GetCartItem), new { id = cartItem.Id }, cartItem);
+        }
 
-//         // PUT: api/Cart/{id}
-//         [HttpPut("{id}")]
-//         public async Task<IActionResult> UpdateCartItem(int id, User user)
-//         {
-//             if (id != user.Id)
-//             {
-//                 return BadRequest();
-//             }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCartItem(int id, CartItem cartItem)
+        {
+            if (id != cartItem.Id)
+            {
+                return BadRequest();
+            }
 
-//             try
-//             {
-//                 _context.Entry(user).State = EntityState.Modified;
-//                 await _context.SaveChangesAsync();
-//                 return NoContent();
-//             }
-//             catch (DbUpdateConcurrencyException)
-//             {
-//                 if (!CartItemExists(id))
-//                 {
-//                     return NotFound();
-//                 }
-//                 else
-//                 {
-//                     throw;
-//                 }
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, $"Internal server error: {ex.Message}");
-//             }
-//         }
+            _context.Entry(cartItem).State = EntityState.Modified;
 
-//         // DELETE: api/Cart/{id}
-//         [HttpDelete("{id}")]
-//         public async Task<IActionResult> RemoveFromCart(int id)
-//         {
-//             try
-//             {
-//                 var item = await _context.CartItems.FindAsync(id);
-//                 if (item == null)
-//                 {
-//                     return NotFound();
-//                 }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CartItemExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-//                 _context.CartItems.Remove(item);
-//                 await _context.SaveChangesAsync();
-//                 return NoContent();
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, $"Internal server error: {ex.Message}");
-//             }
-//         }
+            return NoContent();
+        }
 
-//         private bool CartItemExists(int id)
-//         {
-//             return _context.CartItems.Any(e => e.Id == id);
-//         }
-//     }
-// }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCartItem(int id)
+        {
+            var cartItem = await _context.CartItems.FindAsync(id);
+            if (cartItem == null)
+            {
+                return NotFound();
+            }
+
+            _context.CartItems.Remove(cartItem);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool CartItemExists(int id)
+        {
+            return _context.CartItems.Any(e => e.Id == id);
+        }
+    }
+}
