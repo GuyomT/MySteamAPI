@@ -3,12 +3,12 @@ using ShoppingCart.Models;
 
 namespace ShoppingCart.Data
 {
-    public class CartContext : DbContext
+    public class ShoppingCartContext : DbContext
     {
-        public CartContext(DbContextOptions<CartContext> options) : base(options)
+        public ShoppingCartContext(DbContextOptions<ShoppingCartContext> options) : base(options)
         {
         }
 
-        public DbSet<CartContext> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
     }
 }
