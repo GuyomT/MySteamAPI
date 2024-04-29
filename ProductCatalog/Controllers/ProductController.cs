@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace ProductCatalog.Controllers
 {
-    [Microsoft.AspNetCore.Mvc.ApiController]
-    [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
+    [ApiController]
+    [Route("api/products")]
     public class ProductController : ControllerBase
     {
         private readonly ProductContext _context;
