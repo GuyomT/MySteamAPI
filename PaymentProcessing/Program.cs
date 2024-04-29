@@ -13,7 +13,6 @@ StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 var app = builder.Build();
 
 app.MapControllers();
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
