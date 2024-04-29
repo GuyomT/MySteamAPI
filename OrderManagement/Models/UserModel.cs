@@ -1,17 +1,11 @@
-
-
 namespace OrderManagement.Models
 {
-    public class User
+    public class Order
     {
         public int Id { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string BirthDate { get; set; }
-        public string City { get; set; }
-        public int UserBalance { get; set; } = 1000;
-        // public List<CartItem> CartItems { get; set; } = new List<CartItem>();
-        // public List<Invoice> Invoices { get; set; }
+        public string ProductName { get; set; }
+        public int Quantity { get; set; }
+        public decimal TotalPrice { get; set; }
+        // Autres propriétés d'une commande
     }
-
 }
