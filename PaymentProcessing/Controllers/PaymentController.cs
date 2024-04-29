@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using PaymentProcessing.Models;
 using Stripe;
 
 [ApiController]
@@ -27,10 +28,4 @@ public class PaymentController : ControllerBase
             return BadRequest(new { error = e.StripeError.Message });
         }
     }
-}
-
-public class PaymentRequest
-{
-    public long Amount { get; set; }
-    public string Token { get; set; }
 }
